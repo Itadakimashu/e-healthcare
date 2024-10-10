@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from .models import DoctorProfile,DoctorWorkTime,DayOfWeek,Specialist
+from .constants import *
 
 User = get_user_model()
 
@@ -36,9 +37,9 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
 
 class DoctorRegistrationSerializer(serializers.ModelSerializer):
     name = serializers.CharField(write_only=True,required=True)
-    specialist = serializers.PrimaryKeyRelatedField(queryset=Specialist.objects.all(),write_only=True, many=True)
+    specialist = serializers.MultipleChoiceField(choices=specialists,write_only=True)
     confirm_password = serializers.CharField(write_only=True,required = True)
-    days_of_week = serializers.PrimaryKeyRelatedField(queryset=DayOfWeek.objects.all(),write_only=True, many=True)
+    days_of_week = serializers.MultipleChoiceField(choices=DAYS_OF_WEEK_CHOICES,write_only=True)
     start_time = serializers.TimeField(write_only=True,required=True)
     end_time = serializers.TimeField(write_only=True,required=True)
     consultation_fee = serializers.IntegerField(write_only=True,required=True)
@@ -74,6 +75,7 @@ class DoctorRegistrationSerializer(serializers.ModelSerializer):
         user.save()
 
         
+        
         doctor_profile = DoctorProfile.objects.create(
             user=user, 
             consultation_fee=consultation_fee_data, 
@@ -81,8 +83,9 @@ class DoctorRegistrationSerializer(serializers.ModelSerializer):
             address=validated_data.get('address', ''),
             phone=validated_data.get('phone')
             )
-        doctor_profile.specialist.set(specialist_data)
-
+        for specialist in specialist_data:
+            specialist, created = Specialist.objects.get_or_create(name=specialist)
+            doctor_profile.specialist.add(specialist)
 
         doctor_profile.save()
 
@@ -91,6 +94,8 @@ class DoctorRegistrationSerializer(serializers.ModelSerializer):
             end_time = end_time_data,
             doctor=doctor_profile
         )
-        work_times.days_of_week.set(days_of_week_data)
+        for day in days_of_week_data:
+            day, created = DayOfWeek.objects.get_or_create(name=day)
+            work_times.days_of_week.add(day)
         work_times.save()
         return user

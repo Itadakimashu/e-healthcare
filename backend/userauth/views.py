@@ -32,7 +32,7 @@ class UserLoginView(generics.GenericAPIView):
         if user is not None:
             token = AccessToken.for_user(user)
             return Response({
-                'access': str(token),
+                'accesstoken': str(token),
                 'user':{
                     'username': user.username,
                     'email': user.email,

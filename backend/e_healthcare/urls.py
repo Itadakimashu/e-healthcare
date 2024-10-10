@@ -15,8 +15,22 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path,include
+
+from django.conf import settings
+from django.conf.urls.static import static
+from rest_framework import routers
+
+from userauth.views import CustomUserViewSet
+from doctor.views import DoctorProfileViewSet,get_designations_and_specialists
+
+router = routers.DefaultRouter()
+router.register(r'users', CustomUserViewSet)
+router.register(r'doctors', DoctorProfileViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),
+    path('get-designations-and-specialists/', get_designations_and_specialists),
 ]
+urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

@@ -11,4 +11,5 @@ blood_groups =[
 genders = [
     ('Male', 'Male'),
     ('Female', 'Female'),
+    ('Other', 'Other'),
 ]

@@ -11,7 +11,7 @@ class DoctorProfile(models.Model):
     consultation_fee = models.IntegerField()
     designation = models.CharField(max_length=20, choices=designations)
     specialist = models.ManyToManyField('Specialist')
-    image = models.ImageField(upload_to='media/doctor/')
+    image = models.ImageField(upload_to='doctor/')
     user = models.ForeignKey(User, on_delete=models.CASCADE,related_name='profile')
 
     def save(self, *args, **kwargs):

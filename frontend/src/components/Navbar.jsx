@@ -1,15 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { assets } from "../assets/assets";
 import { NavLink, useNavigate } from "react-router-dom";
+import { ACCESS_TOKEN } from "../constants";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
-  const [token, setToken] = useState(true);
+  const [token, setToken] = useState(null);
+
+  // Check if the token is stored in localStorage on component mount
+  useEffect(() => {
+    const savedToken = localStorage.getItem(ACCESS_TOKEN);
+    if (savedToken) {
+      setToken(true); // Token exists, user is logged in
+    } else {
+      setToken(false); // No token, user is logged out
+    }
+  }, []); // Run this effect only once on component mount
+
+  // Log out function
+  const handleLogout = () => {
+    setToken(false);
+    localStorage.removeItem(ACCESS_TOKEN);
+    navigate('/login'); // Optionally redirect to login page
+  };
 
   return (
     <div className="flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400">
-      <img onClick={()=>navigate('/')} className="w-44 cursor-pointer" src={assets.logo} alt="" />
+      <img onClick={() => navigate('/')} className="w-44 cursor-pointer" src={assets.logo} alt="" />
       <ul className="hidden md:flex items-start gap-5 font-medium">
         <NavLink to="/">
           <li className="py-1">HOME</li>
@@ -28,32 +46,21 @@ const Navbar = () => {
           <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
       </ul>
-      <div
-        onClick={() => navigate("/login")}
-        className="flex items-center gap-4"
-      >
+      <div className="flex items-center gap-4">
         {token ? (
           <div className="flex item-center cursor-pointer gap-2 group relative">
-            <img
-              className="w-8 rounded-full"
-              src={assets.profile_pic}
-              alt=""
-            />
-            <img
-              className="w-2.5"
-              src={assets.dropdown_icon}
-              alt=""
-            />
+            <img className="w-8 rounded-full" src={assets.profile_pic} alt="profile" />
+            <img className="w-2.5" src={assets.dropdown_icon} alt="dropdown icon" />
             <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block">
-                <div className="min-w-48 bg-stone-100 rounded flex-col gap-4 p-4">
-                    <p onClick={()=> navigate('/my-profile')} className="hover:text-black cursor-pointer">My Profile</p>
-                    <p onClick={()=> navigate('/my-appoinments')} className="hover:text-black cursor-pointer">My Appoinments</p>
-                    <p onClick={()=> setToken(false)} className="hover:text-black cursor-pointer">Log Out</p>
-                </div>
+              <div className="min-w-48 bg-stone-100 rounded flex-col gap-4 p-4">
+                <p onClick={() => navigate('/my-profile')} className="hover:text-black cursor-pointer">My Profile</p>
+                <p onClick={() => navigate('/my-appointments')} className="hover:text-black cursor-pointer">My Appointments</p>
+                <p onClick={handleLogout} className="hover:text-black cursor-pointer">Log Out</p>
+              </div>
             </div>
           </div>
         ) : (
-          <button onClick={()=>navigate('/login')} className="bg-blue-500 text-white px-4 py-2 rounded-lg hidden md:block">
+          <button onClick={() => navigate('/login')} className="bg-blue-500 text-white px-4 py-2 rounded-lg hidden md:block">
             Create Account
           </button>
         )}

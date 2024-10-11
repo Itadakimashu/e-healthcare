@@ -1,35 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { User, Clock, DollarSign } from "lucide-react";
+import api from "../api";
 
 const DoctorRegistrationForm = () => {
   const [formData, setFormData] = useState({
     username: "",
     image: null,
-    daysAvailable: [],
-    fullName: "",
+    days_of_week: [],
+    name: "",
     address: "",
     email: "",
     phone: "",
     password: "",
-    confirmPassword: "",
+    confirm_password: "",
     designation: "",
-    specialization: "",
-    workingTimeStart: "",
-    workingTimeEnd: "",
-    fee: "",
+    specialist: [], // Changed from "" to []
+    start_time: "",
+    end_time: "",
+    consultation_fee: "",
   });
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
     if (type === "checkbox") {
-      const updatedDays = checked
-        ? [...formData.daysAvailable, value]
-        : formData.daysAvailable.filter((day) => day !== value);
-
-      const updateSpecialization = checked?
-      [...formData.specialization, value]
-      : formData.specialization.filter((special) => specialization !== value);
-      setFormData({ ...formData, daysAvailable: updatedDays, specialization: updateSpecialization  });
+      if (name === "days_of_week") {
+        const updatedDays = checked
+          ? [...formData.days_of_week, value]
+          : formData.days_of_week.filter((day) => day !== value);
+        setFormData({
+          ...formData,
+          days_of_week: updatedDays,
+        });
+      } else if (name === "specialist") {
+        const updatedSpecialist = checked
+          ? [...formData.specialist, value.toLowerCase().replace(/ /g, "_")]
+          : formData.specialist.filter((special) => special !== value.toLowerCase().replace(/ /g, "_"));
+        setFormData({
+          ...formData,
+          specialist: updatedSpecialist,
+        });
+      }
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -40,10 +51,29 @@ const DoctorRegistrationForm = () => {
     setFormData({ ...formData, image: file });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      formData.designation = formData.designation.toLowerCase().replace(/ /g, "_");
+      const response = await api.post("/doctor-register/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      // Handle successful registration
+      console.log("Registration successful:", response.data);
+      // Optionally, reset the form or redirect the user
+    } catch(error) {
+      if (error.response) {
+        console.error("Server Error:", error.response.data);
+      } else if (error.request) {
+        console.error("No Response:", error.request);
+      } else {
+        console.error("Error:", error.message);
+      }
+    }
     console.log("Form submitted:", formData);
-    // Add form submission logic here
   };
 
   const daysOfWeek = [
@@ -55,21 +85,17 @@ const DoctorRegistrationForm = () => {
     "Saturday",
     "Sunday",
   ];
-  const [designations, setdesignations] = useState([]);
-  const [specializations, setspecializations] = useState([]);
+  const [designations, setDesignations] = useState([]);
+  const [specializations, setSpecializations] = useState([]);
   const timeSlots = Array.from(
     { length: 24 },
     (_, i) => `${i.toString().padStart(2, "0")}:00`
   );
 
-  const handlespecializations = () => {
-    setspecializations(specializations === setspecializations ? null : specializations)
-  };
   useEffect(() => {
     fetch("http://127.0.0.1:8000/get-designations-and-specialists/")
       .then((response) => response.json())
       .then((data) => {
-        // Extract the second element (human-readable part) from each array
         const designationNames = data.designations.map(
           (designation) => designation[1]
         );
@@ -77,8 +103,11 @@ const DoctorRegistrationForm = () => {
           (specialist) => specialist[1]
         );
 
-        setdesignations(designationNames);
-        setspecializations(specializationNames);
+        setDesignations(designationNames);
+        setSpecializations(specializationNames);
+      })
+      .catch((error) => {
+        console.error("Error fetching designations and specializations:", error);
       });
   }, []);
 
@@ -92,11 +121,12 @@ const DoctorRegistrationForm = () => {
           Doctor Registration
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Ready to serve pepole?
+          Ready to serve people?
         </p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4 mt-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Username */}
           <div>
             <label className="block mb-1 text-gray-600">Username</label>
             <input
@@ -108,17 +138,21 @@ const DoctorRegistrationForm = () => {
               required
             />
           </div>
+
+          {/* Full Name */}
           <div>
             <label className="block mb-1 text-gray-600">Full Name</label>
             <input
               type="text"
-              name="fullName"
-              value={formData.fullName}
+              name="name"
+              value={formData.name}
               onChange={handleInputChange}
               className={inputClass}
               required
             />
           </div>
+
+          {/* Email */}
           <div>
             <label className="block mb-1 text-gray-600">Email</label>
             <input
@@ -130,6 +164,8 @@ const DoctorRegistrationForm = () => {
               required
             />
           </div>
+
+          {/* Phone */}
           <div>
             <label className="block mb-1 text-gray-600">Phone</label>
             <input
@@ -141,6 +177,8 @@ const DoctorRegistrationForm = () => {
               required
             />
           </div>
+
+          {/* Address */}
           <div className="md:col-span-2">
             <label className="block mb-1 text-gray-600">Address</label>
             <textarea
@@ -151,6 +189,8 @@ const DoctorRegistrationForm = () => {
               required
             />
           </div>
+
+          {/* Profile Image */}
           <div>
             <label className="block mb-1 text-gray-600">Profile Image</label>
             <input
@@ -160,13 +200,15 @@ const DoctorRegistrationForm = () => {
               accept="image/*"
             />
           </div>
+
+          {/* Consultation Fee */}
           <div>
             <label className="block mb-1 text-gray-600">Consultation Fee</label>
             <div className="relative">
               <input
                 type="number"
-                name="fee"
-                value={formData.fee}
+                name="consultation_fee"
+                value={formData.consultation_fee}
                 onChange={handleInputChange}
                 className={`${inputClass} pl-8`}
                 required
@@ -177,6 +219,8 @@ const DoctorRegistrationForm = () => {
               />
             </div>
           </div>
+
+          {/* Days Available */}
           <div className="md:col-span-2">
             <label className="block mb-1 text-gray-600">Days Available</label>
             <div className="flex flex-wrap gap-2">
@@ -184,9 +228,9 @@ const DoctorRegistrationForm = () => {
                 <label key={day} className="flex items-center space-x-2">
                   <input
                     type="checkbox"
-                    name="daysAvailable"
+                    name="days_of_week"
                     value={day}
-                    checked={formData.daysAvailable.includes(day)}
+                    checked={formData.days_of_week.includes(day)}
                     onChange={handleInputChange}
                     className="form-checkbox h-5 w-5 text-blue-500 rounded focus:ring-blue-500"
                   />
@@ -195,6 +239,8 @@ const DoctorRegistrationForm = () => {
               ))}
             </div>
           </div>
+
+          {/* Designation */}
           <div>
             <label className="block mb-1 text-gray-600">Designation</label>
             <select
@@ -212,32 +258,35 @@ const DoctorRegistrationForm = () => {
               ))}
             </select>
           </div>
+
+          {/* Specializations */}
           <div className="md:col-span-2">
             <label className="block mb-1 text-gray-600">Specializations</label>
             <div className="flex flex-wrap gap-2">
-              {specializations.map((specialization, index) => (
+              {specializations.map((specialist, index) => (
                 <label key={index} className="flex items-center space-x-2">
                   <input
                     type="checkbox"
-                    name="specialization"
-                    value={specialization}
-                    checked={formData.specialization.includes(specialization)}
+                    name="specialist"
+                    value={specialist}
+                    checked={formData.specialist.includes(specialist.toLowerCase())}
                     onChange={handleInputChange}
-                    onClick={handlespecializations}
                     className="form-checkbox h-5 w-5 text-blue-500 rounded focus:ring-blue-500"
                   />
-                  <span className="text-gray-600">{specialization}</span>
+                  <span className="text-gray-600">{specialist}</span>
                 </label>
               ))}
             </div>
           </div>
+
+          {/* Working Time Start */}
           <div>
             <label className="block mb-1 text-gray-600">
               Working Time Start
             </label>
             <select
-              name="workingTimeStart"
-              value={formData.workingTimeStart}
+              name="start_time"
+              value={formData.start_time}
               onChange={handleInputChange}
               className={inputClass}
               required
@@ -250,11 +299,13 @@ const DoctorRegistrationForm = () => {
               ))}
             </select>
           </div>
+
+          {/* Working Time End */}
           <div>
             <label className="block mb-1 text-gray-600">Working Time End</label>
             <select
-              name="workingTimeEnd"
-              value={formData.workingTimeEnd}
+              name="end_time"
+              value={formData.end_time}
               onChange={handleInputChange}
               className={inputClass}
               required
@@ -267,6 +318,8 @@ const DoctorRegistrationForm = () => {
               ))}
             </select>
           </div>
+
+          {/* Password */}
           <div>
             <label className="block mb-1 text-gray-600">Password</label>
             <input
@@ -278,18 +331,22 @@ const DoctorRegistrationForm = () => {
               required
             />
           </div>
+
+          {/* Confirm Password */}
           <div>
             <label className="block mb-1 text-gray-600">Confirm Password</label>
             <input
               type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
+              name="confirm_password"
+              value={formData.confirm_password}
               onChange={handleInputChange}
               className={inputClass}
               required
             />
           </div>
         </div>
+
+        {/* Navigation Links */}
         <p className="text-center text-gray-600 text-xs mt-2">
           Already have an account?{" "}
           <a href="/doclogin" className="text-blue-500 hover:text-blue-800">
@@ -297,12 +354,13 @@ const DoctorRegistrationForm = () => {
           </a>
         </p>
         <p className="text-center text-gray-600 text-xs mt-2">
-          Are you are a patient?{" "}
+          Are you a patient?{" "}
           <a href="/register" className="text-blue-500 hover:text-blue-800">
             Click Here
           </a>
         </p>
 
+        {/* Submit Button */}
         <div className="flex justify-center">
           <button
             type="submit"

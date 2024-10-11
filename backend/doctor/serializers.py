@@ -37,9 +37,10 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
 
 class DoctorRegistrationSerializer(serializers.ModelSerializer):
     name = serializers.CharField(write_only=True,required=True)
-    specialist = serializers.MultipleChoiceField(choices=specialists,write_only=True)
+    specialist = serializers.ListField(child=serializers.CharField(), required=False)
+    designation = serializers.ChoiceField(choices=designations,write_only=True)
     confirm_password = serializers.CharField(write_only=True,required = True)
-    days_of_week = serializers.MultipleChoiceField(choices=DAYS_OF_WEEK_CHOICES,write_only=True)
+    days_of_week = serializers.ListField(child=serializers.CharField(), required=False)
     start_time = serializers.TimeField(write_only=True,required=True)
     end_time = serializers.TimeField(write_only=True,required=True)
     consultation_fee = serializers.IntegerField(write_only=True,required=True)
@@ -49,22 +50,23 @@ class DoctorRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'name', 'image', 'password', 'confirm_password', 'email', 'specialist','days_of_week','start_time','end_time','consultation_fee','address','phone']
+        fields = ['username', 'name', 'image', 'password', 'confirm_password', 'email','designation', 'specialist','days_of_week','start_time','end_time','consultation_fee','address','phone']
 
     def create(self, validated_data):
-        specialist_data = validated_data.pop('specialist')
-        days_of_week_data = validated_data.pop('days_of_week')
+        specialist_data = validated_data.pop('specialist', [])
+        days_of_week_data = validated_data.pop('days_of_week', [])
 
         start_time_data = validated_data.pop('start_time')
         end_time_data = validated_data.pop('end_time')
         consultation_fee_data = validated_data.pop('consultation_fee')
-
+        print(specialist_data)
+        print(days_of_week_data)
 
         if validated_data['password'] != validated_data['confirm_password']:
             raise serializers.ValidationError({'password': 'Passwords must match.'})
         if User.objects.filter(email=validated_data['email']).exists():
-            raise serializers.ValidationError({'error' : "Email Already exists"})
-        
+            raise serializers.ValidationError({'error': "Email Already exists"})
+
         user = User.objects.create_user(
             username=validated_data['username'],
             name=validated_data['name'],
@@ -74,28 +76,27 @@ class DoctorRegistrationSerializer(serializers.ModelSerializer):
         )
         user.save()
 
-        
-        
         doctor_profile = DoctorProfile.objects.create(
-            user=user, 
-            consultation_fee=consultation_fee_data, 
+            user=user,
+            consultation_fee=consultation_fee_data,
             image=validated_data.get('image'),
             address=validated_data.get('address', ''),
-            phone=validated_data.get('phone')
-            )
+            phone=validated_data.get('phone'),
+            designation=validated_data.get('designation'),
+        )
         for specialist in specialist_data:
-            specialist, created = Specialist.objects.get_or_create(name=specialist)
-            doctor_profile.specialist.add(specialist)
+            specialist_obj, created = Specialist.objects.get_or_create(name=specialist)
+            doctor_profile.specialist.add(specialist_obj)
 
         doctor_profile.save()
 
         work_times = DoctorWorkTime.objects.create(
-            start_time = start_time_data,
-            end_time = end_time_data,
+            start_time=start_time_data,
+            end_time=end_time_data,
             doctor=doctor_profile
         )
         for day in days_of_week_data:
-            day, created = DayOfWeek.objects.get_or_create(name=day)
-            work_times.days_of_week.add(day)
+            day_obj, created = DayOfWeek.objects.get_or_create(name=day)
+            work_times.days_of_week.add(day_obj)
         work_times.save()
         return user

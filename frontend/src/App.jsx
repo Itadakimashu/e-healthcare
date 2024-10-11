@@ -23,6 +23,7 @@ import { assets } from "./assets/assets";
 import Register from "./pages/Register";
 import DoctorRegistrationForm from "./pages/DoctorRegistrationForm";
 import DoctorLoginForm from "./pages/DoctorLoginForm";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const { Sider, Header, Content } = Layout;
 
@@ -130,7 +131,14 @@ const App = () => {
     <div className="mx-4 sm:mx-[10%]">
       <Navbar />
       <Routes>
-        <Route path="/" element={<Home />} />
+      <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
         <Route path="/doctors" element={<Doctors />} />
         <Route path="/doctors/:speciality" element={<Doctors />} />
         <Route path="/login" element={<Login />} />
@@ -145,6 +153,7 @@ const App = () => {
         <Route path="/my-appoinments" element={<MyAppoinments />} />
         <Route path="/appoinment/:docId" element={<Appoinment />} />
       </Routes>
+      
       <Footer />
     </div>
   );

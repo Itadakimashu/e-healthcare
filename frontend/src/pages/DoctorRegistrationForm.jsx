@@ -55,20 +55,33 @@ const DoctorRegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      formData.designation = formData.designation.toLowerCase().replace(/ /g, "_")
+      const formDataToSend = new FormData();
+      formDataToSend.append("username", formData.username);
+      formDataToSend.append("image", formData.image);
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("address", formData.address);
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("phone", formData.phone);
+      formDataToSend.append("password", formData.password);
+      formDataToSend.append("confirm_password", formData.confirm_password);
+      formDataToSend.append("designation", formData.designation.toLowerCase().replace(/ /g, "_"));
+      formDataToSend.append("start_time", formData.start_time);
+      formDataToSend.append("end_time", formData.end_time);
+      formDataToSend.append("consultation_fee", formData.consultation_fee);
+      formData.days_of_week.forEach(day => formDataToSend.append("days_of_week", day));
+      formData.specialist.forEach(special => formDataToSend.append("specialist", special));
+  
       const response = await axios.post(
         "http://127.0.0.1:8000/doctor-register/",
-        formData,
+        formDataToSend,
         {
           headers: {
             "Content-Type": "multipart/form-data", // Let axios set the boundary
           },
         }
       );
-
-      // Handle successful registration
+  
       console.log("Registration successful:", response.data);
-      // Optionally, reset the form or redirect the user
     } catch (error) {
       if (error.response) {
         console.error("Server Error:", error.response.data);

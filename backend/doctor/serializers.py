@@ -59,10 +59,10 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
 
 class DoctorRegistrationSerializer(serializers.ModelSerializer):
     name = serializers.CharField(write_only=True,required=True)
-    specialist = serializers.ListField(child=serializers.CharField(), required=False)
+    specialist = serializers.MultipleChoiceField(write_only=True,required=True, choices=specialists)
     designation = serializers.ChoiceField(choices=designations,write_only=True)
     confirm_password = serializers.CharField(write_only=True,required = True)
-    days_of_week = serializers.ListField(child=serializers.CharField(), required=False)
+    days_of_week = serializers.MultipleChoiceField(write_only=True,required=True, choices=DAYS_OF_WEEK_CHOICES)
     start_time = serializers.TimeField(write_only=True,required=True)
     end_time = serializers.TimeField(write_only=True,required=True)
     consultation_fee = serializers.IntegerField(write_only=True,required=True)
@@ -75,14 +75,15 @@ class DoctorRegistrationSerializer(serializers.ModelSerializer):
         fields = ['username', 'name', 'image', 'password', 'confirm_password', 'email','designation', 'specialist','days_of_week','start_time','end_time','consultation_fee','address','phone']
 
     def create(self, validated_data):
-        specialist_data = validated_data.pop('specialist', [])
-        days_of_week_data = validated_data.pop('days_of_week', [])
+        specialist_data = validated_data.pop('specialist')
+        days_of_week_data = validated_data.pop('days_of_week')
 
         start_time_data = validated_data.pop('start_time')
         end_time_data = validated_data.pop('end_time')
         consultation_fee_data = validated_data.pop('consultation_fee')
         print(specialist_data)
         print(days_of_week_data)
+        print(start_time_data)
 
         if validated_data['password'] != validated_data['confirm_password']:
             raise serializers.ValidationError({'password': 'Passwords must match.'})
@@ -108,7 +109,9 @@ class DoctorRegistrationSerializer(serializers.ModelSerializer):
         )
         for specialist in specialist_data:
             specialist_obj, created = Specialist.objects.get_or_create(name=specialist)
+            print(specialist_obj, created)
             doctor_profile.specialist.add(specialist_obj)
+
 
         doctor_profile.save()
 

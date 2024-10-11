@@ -7,8 +7,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import DoctorProfile
-from .serializers import DoctorProfileSerializer,DoctorRegistrationSerializer
+from .models import DoctorProfile,DoctorRating
+from .serializers import DoctorProfileSerializer,DoctorRegistrationSerializer,DoctorRatingSerializer
 from .constants import designations, specialists
 
 
@@ -30,6 +30,11 @@ class DoctorRegistrationView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class DoctorRatingView(viewsets.ReadOnlyModelViewSet):
+    queryset = DoctorRating.objects.all()
+    serializer_class = DoctorRatingSerializer
 
 
 def get_designations_and_specialists(request):

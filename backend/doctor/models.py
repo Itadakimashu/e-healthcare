@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 
 from .constants import *
+from patient.models import PatientProfile
 
 User = get_user_model()
 
@@ -43,3 +44,14 @@ class DayOfWeek(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+class DoctorRating(models.Model):
+    doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, related_name='reviews')
+    patient = models.ForeignKey(PatientProfile,on_delete=models.CASCADE,related_name='reviews')
+    rating = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)])
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.doctor.user.username} - {self.rating}"

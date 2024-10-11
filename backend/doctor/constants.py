@@ -13,7 +13,6 @@ specialists = [
     ('gastroenterologist', 'Gastroenterologist'),
     ('neurologist', 'Neurologist'),
     ('general_physician', 'General Physician'),
-    ('surgeon', 'Surgeon'),
 ]
 
 DAYS_OF_WEEK_CHOICES = [

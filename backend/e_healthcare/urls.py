@@ -11,6 +11,7 @@ from userauth.views import CustomUserViewSet,UserLoginView
 from doctor.views import (
     DoctorProfileViewSet,
     DoctorRegistrationView,
+    DoctorRatingView,
     get_designations_and_specialists
 )
 from patient.views import PatientProfileViewSet,PatientRegistrationView,get_blood_groups_and_genders
@@ -19,6 +20,7 @@ router = routers.DefaultRouter()
 router.register(r'users', CustomUserViewSet)
 router.register(r'doctors', DoctorProfileViewSet)
 router.register(r'patients', PatientProfileViewSet)
+router.register(r'doctor-ratings', DoctorRatingView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

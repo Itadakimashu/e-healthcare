@@ -2,7 +2,16 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 
-from .models import DoctorProfile,DoctorWorkTime,DayOfWeek,Specialist
+from .models import (
+    DoctorProfile,
+    DoctorWorkTime,
+    DayOfWeek,
+    Specialist,
+    DoctorRating,
+    )
+
+from patient.serializers import PatientProfileSerializer
+
 from .constants import *
 
 User = get_user_model()
@@ -25,10 +34,23 @@ class SpecialistSerializer(serializers.ModelSerializer):
         exclude = ['id']
 
 
+class DoctorRatingSerializer(serializers.ModelSerializer):
+    patient = PatientProfileSerializer(read_only=True)
+    class Meta:
+        model = DoctorRating
+        exclude = ['doctor']
+
+class DoctorRatingCreationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DoctorRating
+        fields = ['__all__']
+
+
 class DoctorProfileSerializer(serializers.ModelSerializer):
     work_times = DoctorWorkTimeSerializer(many=True, read_only=True)
     specialist = SpecialistSerializer(many=True, read_only=True)
     name = serializers.CharField(source='user.name', read_only=True)
+    reviews = DoctorRatingSerializer(many=True, read_only=True)
     class Meta:
         model = DoctorProfile
         exclude = ['user']

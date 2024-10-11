@@ -10,6 +10,7 @@ from rest_framework import status
 from .models import DoctorProfile,DoctorRating
 from .serializers import DoctorProfileSerializer,DoctorRegistrationSerializer,DoctorRatingSerializer
 from .constants import designations, specialists
+from rest_framework.permissions import AllowAny
 
 
 
@@ -24,7 +25,9 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
 
 class DoctorRegistrationView(APIView):
     serializer_class = DoctorRegistrationSerializer
+    permission_classes = [AllowAny]
     def post(self, request, *args, **kwargs):
+        print("Request Data:", request.data)
         serializer = DoctorRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

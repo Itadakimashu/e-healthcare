@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { User, Clock, DollarSign } from "lucide-react";
 import api from "../api";
+import axios from "axios";
 
 const DoctorRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -54,17 +55,21 @@ const DoctorRegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      formData.designation = formData.designation.toLowerCase().replace(/ /g, "_");
-      const response = await api.post("/doctor-register/", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      formData.designation = formData.designation.toLowerCase().replace(/ /g, "_")
+      const response = await axios.post(
+        "http://127.0.0.1:8000/doctor-register/",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data", // Let axios set the boundary
+          },
+        }
+      );
 
       // Handle successful registration
       console.log("Registration successful:", response.data);
       // Optionally, reset the form or redirect the user
-    } catch(error) {
+    } catch (error) {
       if (error.response) {
         console.error("Server Error:", error.response.data);
       } else if (error.request) {

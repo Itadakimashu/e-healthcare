@@ -16,11 +16,14 @@ from doctor.views import (
 )
 from patient.views import PatientProfileViewSet,PatientRegistrationView,get_blood_groups_and_genders
 
+from appointment.views import AppointmentViewSet,AppointmentCreateView
+
 router = routers.DefaultRouter()
 router.register(r'users', CustomUserViewSet)
 router.register(r'doctors', DoctorProfileViewSet)
 router.register(r'patients', PatientProfileViewSet)
 router.register(r'doctor-ratings', DoctorRatingView)
+router.register(r'appointments', AppointmentViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,6 +34,7 @@ urlpatterns = [
 
     path('get-designations-and-specialists/', get_designations_and_specialists),
     path('get-blood-groups-and-genders/', get_blood_groups_and_genders),
+    path('create-appointment/', AppointmentCreateView.as_view()),
 
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), 
 

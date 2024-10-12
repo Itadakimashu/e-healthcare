@@ -1,7 +1,7 @@
 designations = [
     ('senior_consultant', 'Senior Consultant'),
     ('junior_consultant', 'Junior Consultant'),
-    ('medicine_special', 'Medicine Specialist'),
+    ('medicine_specialist', 'Medicine Specialist'),
     ('medical_officer', 'Medical Officer'),
     ('surgeon', 'Surgeon'),
     ('pediatrician', 'Pediatrician'),

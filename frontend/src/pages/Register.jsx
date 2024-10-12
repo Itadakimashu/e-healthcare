@@ -1,16 +1,18 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    firstname: "",
-    lastname: "",
+    username: "",
+    name: "",
     email: "",
     password: "",
-    password2: "",
+    confirm_password: "",
     allergies: "",
-    bloodType: "",
+    blood_group: "",
     gender: "",
     phone: "",
+    date_of_birth: "",
   });
 
   const handleChange = (e) => {
@@ -21,10 +23,30 @@ const Register = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/patient-register/",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("Registration successful:", response.data);
+      // <NavLink to={"/"} />;
+    } catch (error) {
+      if (error.response) {
+        console.error("Server Error:", error.response.data);
+      } else if (error.request) {
+        console.error("No Response:", error.request);
+      } else {
+        console.error("Error:", error.message);
+      }
+    }
     console.log("Form submitted:", formData);
-    // Here you would typically send the data to your backend
   };
 
   return (
@@ -44,35 +66,35 @@ const Register = () => {
             <div className="flex flex-wrap -mx-3">
               <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                 <label
-                  htmlFor="firstname"
+                  htmlFor="username"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  First Name
+                  Username
                 </label>
                 <input
-                  id="firstname"
-                  name="firstname"
+                  id="username"
+                  name="username"
                   type="text"
-                  autoComplete="name"
+                  autoComplete="username"
                   required
                   className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  value={formData.firstname}
+                  value={formData.username}
                   onChange={handleChange}
                 />
               </div>
               <div className="w-full md:w-1/2 px-3">
                 <label
-                  htmlFor="lastname"
+                  htmlFor="name"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Last Name
+                  Full Name
                 </label>
                 <input
-                  id="lastname"
-                  name="lastname"
+                  id="name"
+                  name="name"
                   type="text"
                   className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  value={formData.lastname}
+                  value={formData.name}
                   onChange={handleChange}
                 />
               </div>
@@ -145,10 +167,10 @@ const Register = () => {
                   Blood Type (optional)
                 </label>
                 <select
-                  id="bloodType"
-                  name="bloodType"
+                  id="blood_group"
+                  name="blood_group"
                   className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                  value={formData.bloodType}
+                  value={formData.blood_group}
                   onChange={handleChange}
                 >
                   <option value="">Select Blood</option>
@@ -162,6 +184,22 @@ const Register = () => {
                   <option value="O-">O-</option>
                 </select>
               </div>
+            </div>
+            <div>
+              <label
+                htmlFor="date_of_birth"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Date of Birth
+              </label>
+              <input
+                id="date_of_birth"
+                name="date_of_birth"
+                type="date"
+                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                value={formData.date_of_birth}
+                onChange={handleChange}
+              />
             </div>
             <div>
               <label
@@ -206,13 +244,13 @@ const Register = () => {
                   Confirm Password
                 </label>
                 <input
-                  id="password2"
-                  name="password2"
+                  id="confirm_password"
+                  name="confirm_password"
                   type="password"
                   autoComplete="confirm-password"
                   required
                   className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  value={formData.password2}
+                  value={formData.confirm_password}
                   onChange={handleChange}
                 />
               </div>
@@ -234,7 +272,10 @@ const Register = () => {
           </p>
           <p className="text-center text-gray-500 text-xs mt-2">
             Are you are a doctor?{" "}
-            <a href="/docregister" className="text-blue-500 hover:text-blue-800">
+            <a
+              href="/docregister"
+              className="text-blue-500 hover:text-blue-800"
+            >
               Click Here
             </a>
           </p>

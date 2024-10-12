@@ -12,17 +12,17 @@ const Navbar = () => {
   useEffect(() => {
     const savedToken = localStorage.getItem(ACCESS_TOKEN);
     if (savedToken) {
-      setToken(true); // Token exists, user is logged in
+      setToken(true);
     } else {
-      setToken(false); // No token, user is logged out
+      setToken(false); 
     }
-  }, []); // Run this effect only once on component mount
+  }, []);
 
-  // Log out function
+ 
   const handleLogout = () => {
     setToken(false);
     localStorage.removeItem(ACCESS_TOKEN);
-    navigate('/login'); // Optionally redirect to login page
+    navigate('/login');
   };
 
   return (

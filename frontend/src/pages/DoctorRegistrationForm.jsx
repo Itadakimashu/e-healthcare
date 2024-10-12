@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { User, Clock, DollarSign } from "lucide-react";
 import api from "../api";
 import axios from "axios";
+import { NavLink } from "react-router-dom";
 
 const DoctorRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -76,12 +77,13 @@ const DoctorRegistrationForm = () => {
         formDataToSend,
         {
           headers: {
-            "Content-Type": "multipart/form-data", // Let axios set the boundary
+            "Content-Type": "multipart/form-data",
           },
         }
       );
   
       console.log("Registration successful:", response.data);
+      <NavLink to={'/'}/>
     } catch (error) {
       if (error.response) {
         console.error("Server Error:", error.response.data);

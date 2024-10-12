@@ -1,7 +1,6 @@
 import "./App.css";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { Layout, Button } from "antd";
-// import 'antd/dist/antd.css';
 import Home from "./pages/Home";
 import Doctors from "./pages/Doctors";
 import Login from "./pages/Login";
@@ -12,25 +11,23 @@ import Appoinment from "./pages/Appoinment";
 import Contact from "./pages/Contact";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import Dashboard from "./pages/AdminPanel/Dashbored"; // Fixed typo
+import Dashboard from "./pages/AdminPanel/Dashbored";
 import Sidebar from "./pages/AdminPanel/Sidebar";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Appointments from "./pages/AdminPanel/Appointments";
-import AddDoctor from "./pages/AdminPanel/AddDoctor";
-import DoctorList from "./pages/AdminPanel/DoctorList";
 import { assets } from "./assets/assets";
 import Register from "./pages/Register";
 import DoctorRegistrationForm from "./pages/DoctorRegistrationForm";
 import DoctorLoginForm from "./pages/DoctorLoginForm";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { AppContext } from "./context/AppContext";
 
 const { Sider, Header, Content } = Layout;
 
 const App = () => {
-  const [isLoggedInAdmin, setIsAdminLoggedIn] = useState(false);
-
-  const [collapsed, setCollapsed] = useState(window.innerWidth < 768); 
+  const { whoLoggedIn, setwhoLoggedIn } = useContext(AppContext);
+  const [collapsed, setCollapsed] = useState(false);
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
@@ -45,6 +42,8 @@ const App = () => {
   };
 
   useEffect(() => {
+    handleResize();
+
     window.addEventListener("resize", handleResize);
 
     return () => {
@@ -52,20 +51,30 @@ const App = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const storedWhoLoggedIn = localStorage.getItem("whoLoggedIn");
+    if (storedWhoLoggedIn) {
+      setwhoLoggedIn(storedWhoLoggedIn);
+    }
+  }, [setwhoLoggedIn]);
+
+  useEffect(() => {
+    if (whoLoggedIn) {
+      localStorage.setItem("whoLoggedIn", whoLoggedIn);
+    }
+  }, [whoLoggedIn]);
+
   const DynamicHeader = () => {
     const location = useLocation();
 
     let headerText = "Default Header";
-    if (location.pathname === "/") {
-      headerText = "Dashboard";
-    } else if (location.pathname === "/add-doctor") {
-      headerText = "Add Doctor";
-    }
-     else if (location.pathname === "/appointments") {
-      headerText = "Appointments";
-    }
-    else if (location.pathname === "/doctor-list") {
-      headerText = "Doctor List";
+    const adminRoutes = {
+      "/dashboard": "Dashboard",
+      "/appointments": "Appointments",
+    };
+
+    if (adminRoutes[location.pathname]) {
+      headerText = adminRoutes[location.pathname];
     }
 
     return (
@@ -89,7 +98,20 @@ const App = () => {
     );
   };
 
-  const AdminLayout = () => (
+  const logout = () => {
+    localStorage.clear();
+    setwhoLoggedIn(null);
+    window.location.href = "/";
+  };
+
+  const Logout = () => {
+    useEffect(() => {
+      logout();
+    }, []);
+    return null;
+  };
+
+  const DoctorLayout = () => (
     <Layout style={{ minHeight: "100vh" }}>
       <Sider
         collapsible
@@ -105,9 +127,7 @@ const App = () => {
             background: "rgba(255, 255, 255, 0.3)",
           }}
         >
-          {/* Logo Placeholder */}
-          {/* <Logo /> */}
-          <img src={assets.logo} alt="" />
+          <img src={assets.logo} alt="Logo" />
         </div>
         <Sidebar />
       </Sider>
@@ -116,10 +136,34 @@ const App = () => {
         <Content style={{ margin: "16px" }}>
           <div style={{ padding: 24, background: "#fff", minHeight: 360 }}>
             <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/appointments" element={<Appointments />} />
-              <Route path="/add-doctor" element={<AddDoctor />} />
-              <Route path="/doctor-list" element={<DoctorList />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/appointments"
+                element={
+                  <ProtectedRoute>
+                    <Appointments />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/logout"
+                element={
+                  <ProtectedRoute>
+                    <Logout /> 
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="*"
+                element={<Navigate to="/dashboard" />}
+              />
             </Routes>
           </div>
         </Content>
@@ -131,38 +175,43 @@ const App = () => {
     <div className="mx-4 sm:mx-[10%]">
       <Navbar />
       <Routes>
-      <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
+        <Route path="/" element={<Home />} />
         <Route path="/doctors" element={<Doctors />} />
         <Route path="/doctors/:speciality" element={<Doctors />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/dd" element={<MyAppoinments/>} />
-        <Route path="/register" element={<Register/>} />
-        <Route path="/docregister" element={<DoctorRegistrationForm/>} />
-        <Route path="/doclogin" element={<DoctorLoginForm/>} />
-        <Route path="/admin" element={<Dashboard />} />
+        <Route
+          path="/my-appoinments"
+          element={
+            <ProtectedRoute>
+              <MyAppoinments />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/register" element={<Register />} />
+        <Route path="/doclogin" element={<DoctorLoginForm />} />
+        <Route path="/docregister" element={<DoctorRegistrationForm />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/my-profile" element={<MyProfile />} />
-        <Route path="/my-appoinments" element={<MyAppoinments />} />
+        <Route
+          path="/my-profile"
+          element={
+            <ProtectedRoute>
+              <MyProfile />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/appoinment/:docId" element={<Appoinment />} />
+        <Route path="*" element={<Home />} />
       </Routes>
-      
       <Footer />
     </div>
   );
 
-  if (isLoggedInAdmin) {
-    return <AdminLayout />;
-  }
-
-  return <UserLayout />;
+  return (
+    <>
+      {whoLoggedIn === "doctor" ? <DoctorLayout /> : <UserLayout />}
+    </>
+  );
 };
 
 export default App;

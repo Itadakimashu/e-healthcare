@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Layout, Menu, Card, Table, List, Avatar } from 'antd';
-import doctor_icon  from '../../assets_admin/doctor_icon.svg';
+import earning_icon  from '../../assets_admin/earning_icon.svg';
 import patients_icon  from '../../assets_admin/patients_icon.svg';
 import appointments_icon  from '../../assets_admin/appointments_icon.svg';
 
@@ -35,10 +35,10 @@ const Dashboard = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
           <Card style={{ width: '30%' }}>
             <div className='flex items-center'>
-              <img src={doctor_icon} alt="" />
+              <img src={earning_icon} alt="" />
               <div className='ml-5'>
-                <p>14</p>
-                <p>Doctors</p>
+                <p>$256</p>
+                <p>Earnings</p>
               </div>
             </div>
           </Card>

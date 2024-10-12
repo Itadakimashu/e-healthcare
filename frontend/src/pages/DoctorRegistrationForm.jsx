@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { User, Clock, DollarSign } from "lucide-react";
 import api from "../api";
 import axios from "axios";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const DoctorRegistrationForm = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     image: null,
@@ -83,7 +84,7 @@ const DoctorRegistrationForm = () => {
       );
   
       console.log("Registration successful:", response.data);
-      <NavLink to={'/'}/>
+      navigate('/login');
     } catch (error) {
       if (error.response) {
         console.error("Server Error:", error.response.data);

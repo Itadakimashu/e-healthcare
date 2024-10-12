@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import api from "../api";
 import { Navigate, useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+import { AppContext } from "../context/AppContext";
 
 const Login = () => {
+  const {setwhoLoggedIn} = useContext(AppContext);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -26,12 +29,13 @@ const Login = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-      const { accesstoken, refreshtoken } = response.data;
+      const { accesstoken, refreshtoken, user } = response.data;
       console.log("Login successful:", response.data);
       if (accesstoken) {
         localStorage.setItem(ACCESS_TOKEN, accesstoken);
         localStorage.setItem(REFRESH_TOKEN, refreshtoken);
-        // navigate("/");
+        setwhoLoggedIn(user.usertype);
+        navigate("/");
       } else {
         console.error("Tokens not found in response");
       }
@@ -146,7 +150,7 @@ const Login = () => {
               </p>
               <p className="text-center text-gray-500 text-xs mt-2">
                 Are you are a doctor?{" "}
-                <a href="/docregister" className="text-blue-500 hover:text-blue-800">
+                <a href="/doclogin" className="text-blue-500 hover:text-blue-800">
                   Click Here
                 </a>
               </p>

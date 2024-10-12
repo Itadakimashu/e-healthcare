@@ -1,9 +1,10 @@
-import React, { useState, useContext} from "react";
+import React, { useState, useContext } from "react";
 import { Calendar, Clock } from "lucide-react";
 import { Alert } from "antd";
 import { assets, doctors } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { ACCESS_TOKEN } from "../constants";
 
 const DoctorCard = ({ name, specialty, experience, about, appointmentFee }) => (
   <div className="bg-white p-6 rounded-lg shadow-md flex">
@@ -191,12 +192,21 @@ const Appoinment = () => {
         </div>
       </div>
 
-      <button
-        onClick={handleBooking}
-        className="mt-8 w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors duration-200"
-      >
-        Book an appointment
-      </button>
+      {localStorage.getItem(ACCESS_TOKEN) ? (
+        <button
+          onClick={handleBooking}
+          className="mt-8 w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors duration-200"
+        >
+          Book an appointment
+        </button>
+      ) : (
+        <button
+          onClick={()=> navigate('/login')}
+          className="mt-8 w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors duration-200"
+        >
+          Book an appointment
+        </button>
+      )}
 
       {alert && (
         <Alert
@@ -217,9 +227,12 @@ const Appoinment = () => {
         </p>
         <hr />
         <div className="w-full mt-5 grid grid-cols-1sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
-          {doctors.slice(0,4).map((item, index) => (
+          {doctors.slice(0, 4).map((item, index) => (
             <div
-              onClick={() => {navigate(`/appoinment/${item._id}`); scrollTo(0,0)}}
+              onClick={() => {
+                navigate(`/appoinment/${item._id}`);
+                scrollTo(0, 0);
+              }}
               key={index}
               className="border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:-translate-y-2 transition-all duration-500"
             >

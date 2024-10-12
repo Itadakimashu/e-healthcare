@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { User, Lock } from "lucide-react";
 import api from "../api";
 import { Navigate, useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+import { AppContext } from "../context/AppContext";
+
 
 const DoctorLoginForm = () => {
   const navigate = useNavigate();
+  const {setwhoLoggedIn} = useContext(AppContext);
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -24,12 +27,13 @@ const DoctorLoginForm = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-      const { accesstoken, refreshtoken } = response.data;
+      const { accesstoken, refreshtoken, user } = response.data;
       console.log("Login successful:", response.data);
       if (accesstoken) {
         localStorage.setItem(ACCESS_TOKEN, accesstoken);
         localStorage.setItem(REFRESH_TOKEN, refreshtoken);
-        navigate("/");
+        setwhoLoggedIn(user.usertype);
+        navigate("/dashbord");
       } else {
         console.error("Tokens not found in response");
       }

@@ -9,7 +9,7 @@ const Appointments = () => {
     {
       key: "1",
       patient: "Richard James",
-      department: "Cardiology",
+      sypmtopm: "Vomit",
       age: 28,
       dateTime: "24th July, 2024, 10:AM",
       doctor: "Dr. Richard James",
@@ -18,7 +18,7 @@ const Appointments = () => {
     {
       key: "2",
       patient: "Richard James",
-      department: "Neurology",
+      sypmtopm: "Hert Attack",
       age: 28,
       dateTime: "24th July, 2024, 10:AM",
       doctor: "Dr. Richard James",
@@ -47,9 +47,9 @@ const Appointments = () => {
       ),
     },
     {
-      title: "Department",
-      dataIndex: "department",
-      key: "department",
+      title: "Sypmtopm",
+      dataIndex: "sypmtopm",
+      key: "sypmtopm",
     },
     {
       title: "Age",
@@ -60,20 +60,6 @@ const Appointments = () => {
       title: "Date & Time",
       dataIndex: "dateTime",
       key: "dateTime",
-    },
-    {
-      title: "Doctor",
-      dataIndex: "doctor",
-      key: "doctor",
-      render: (text) => (
-        <span>
-          <Avatar
-            src="https://xsgames.co/randomusers/avatar.php?g=pixel"
-            style={{ marginRight: 8 }}
-          />
-          {text}
-        </span>
-      ),
     },
     {
       title: "Fees",

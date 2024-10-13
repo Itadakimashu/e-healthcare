@@ -34,6 +34,7 @@ const Login = () => {
       if (accesstoken) {
         localStorage.setItem(ACCESS_TOKEN, accesstoken);
         localStorage.setItem(REFRESH_TOKEN, refreshtoken);
+        localStorage.setItem('user id', user.id);
         setwhoLoggedIn(user.usertype);
         navigate("/");
       } else {

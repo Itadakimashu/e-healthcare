@@ -12,6 +12,7 @@ from rest_framework.response import Response
 
 from .serializers import CustomUserSerializer
 
+
 # Create your views here.
 User = get_user_model()
 
@@ -33,12 +34,12 @@ class UserLoginView(generics.GenericAPIView):
             token = AccessToken.for_user(user)
             return Response({
                 'accesstoken': str(token),
-                'user':{
+                'user': {
                     'username': user.username,
                     'email': user.email,
                     'id': user.id,
                     'usertype': user.usertype,
-                    'name': user.name
+                    'name': user.name,
                 }
             })
         return Response({'error': 'Invalid credentials'}, status=400)

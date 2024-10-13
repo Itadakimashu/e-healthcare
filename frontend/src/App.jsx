@@ -200,7 +200,7 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-        <Route path="/appoinment/:docId" element={<Appoinment />} />
+        <Route path="/appoinment/:id" element={<Appoinment />} />
         <Route path="*" element={<Home />} />
       </Routes>
       <Footer />

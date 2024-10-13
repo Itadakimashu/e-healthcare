@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
 
 from doctor.serializers import DoctorProfileSerializer
 from patient.serializers import PatientProfileSerializer
@@ -8,6 +9,7 @@ from doctor.models import DoctorProfile
 
 from .models import Appointment
 
+User = get_user_model()
 
 class AppointmentSerializer(serializers.ModelSerializer):
     doctor = DoctorProfileSerializer()
@@ -18,23 +20,32 @@ class AppointmentSerializer(serializers.ModelSerializer):
     
 
 class AppointmentCreateSerializer(serializers.ModelSerializer):
-    doctor_id = serializers.ChoiceField(write_only=True,choices=[(doctor.id,doctor.id) for doctor in DoctorProfile.objects.all()])
-    patient_id = serializers.ChoiceField(write_only=True,choices=[(patient.id,patient.id) for patient in PatientProfile.objects.all()])
+    doctor_id = serializers.PrimaryKeyRelatedField(queryset=DoctorProfile.objects.all(), write_only = True)
+    user_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), write_only = True) 
+    
     class Meta:
         model = Appointment
-        fields = ['doctor_id','patient_id','day','date']
+        fields = ['doctor_id', 'user_id', 'day', 'date']
     
     def create(self, validated_data):
-        doctor = DoctorProfile.objects.get(id=validated_data['doctor_id'])
-        patient = PatientProfile.objects.get(id=validated_data['patient_id'])
+        try:
+            user = validated_data.get('user_id')
+            doctor = validated_data.get('doctor_id') 
+            patient = PatientProfile.objects.get(user=user)
+            print(user.id)
+            print(patient.id)
 
-        print('1\n')
-        serial_number = doctor.appointments.filter(day=validated_data['day']).count() + 1
+            serial_number = doctor.appointments.filter(day=validated_data['day']).count() + 1
 
-        appointment = Appointment.objects.create(
-            doctor=doctor,patient=patient,
-            day=validated_data['day'],
-            date=validated_data['date'],
-            serial_number=serial_number
-        )
-        return appointment
+            appointment = Appointment.objects.create(
+                doctor=doctor,
+                patient=patient,
+                day=validated_data['day'],
+                date=validated_data['date'],
+                serial_number=serial_number
+            )
+
+            return appointment
+        except Exception as e:
+            raise serializers.ValidationError({'error': str(e)})
+

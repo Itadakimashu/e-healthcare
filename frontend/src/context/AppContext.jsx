@@ -7,7 +7,7 @@ export const AppContext = createContext();
 
 const AppContextProvider = ({ children }) => {
     const [whoLoggedIn, setwhoLoggedIn] = useState(null);
-    const value = { doctors, whoLoggedIn, setwhoLoggedIn };
+    const value = { doctors, whoLoggedIn, setwhoLoggedIn};
     return (
         <AppContext.Provider value={value}>
             {children}

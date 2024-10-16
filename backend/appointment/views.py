@@ -16,7 +16,7 @@ class AppointmentViewSet(viewsets.ReadOnlyModelViewSet):
 
 class AppointmentCreateView(APIView):
     serializer_class = AppointmentCreateSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         serializer = AppointmentCreateSerializer(data=request.data)
         if serializer.is_valid():

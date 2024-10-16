@@ -16,7 +16,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
     patient = PatientProfileSerializer()
     class Meta:
         model = Appointment
-        fields = ['doctor','patient','day','date','serial_number','status']
+        fields = ['doctor','patient','symptoms','day','date','serial_number','doctor_review','status']
     
 
 class AppointmentCreateSerializer(serializers.ModelSerializer):
@@ -46,6 +46,21 @@ class AppointmentCreateSerializer(serializers.ModelSerializer):
             )
 
             return appointment
+        except Exception as e:
+            raise serializers.ValidationError({'error': str(e)})
+        
+
+class AppointmentUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = ['status','doctor_review']
+    
+    def update(self, instance, validated_data):
+        try:
+            instance.status = validated_data.get('status', instance.status)
+            instance.doctor_review = validated_data.get('doctor_review', instance.doctor_review)
+            instance.save()
+            return instance
         except Exception as e:
             raise serializers.ValidationError({'error': str(e)})
 

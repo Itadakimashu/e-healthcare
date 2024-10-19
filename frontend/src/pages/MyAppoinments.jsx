@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import api from "../api";
 
 const MyAppointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -6,18 +7,14 @@ const MyAppointments = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/appointments/");
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        setAppointments(data);
+        const response = await api.get('/api/appointments/');
+        setAppointments(response.data);
       } catch (error) {
-        console.error("Error fetching appointments:", error);
+        console.error('Failed to fetch appointments:', error);
       }
     };
     fetchAppointments();
-  }, []); 
+  }, []);
 
   return (
     <div className="my-appointments">

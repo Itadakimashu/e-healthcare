@@ -1,21 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Layout, Menu, Card, Table, List, Avatar } from 'antd';
 import earning_icon  from '../../assets_admin/earning_icon.svg';
 import patients_icon  from '../../assets_admin/patients_icon.svg';
 import appointments_icon  from '../../assets_admin/appointments_icon.svg';
+import api from '../../api';
 
 const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [appointments, setAppointments] = useState([]);
 
-  const appointments = [
-    { id: 1, doctor: 'Dr. Richard James', date: '24th July, 2024' },
-    { id: 2, doctor: 'Dr. Richard James', date: '24th July, 2024' },
-    { id: 3, doctor: 'Dr. Richard James', date: '24th July, 2024' },
-    { id: 4, doctor: 'Dr. Richard James', date: '24th July, 2024' },
-    { id: 5, doctor: 'Dr. Richard James', date: '24th July, 2024' },
-  ];
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const response = await api.get('/api/appointments/');
+        setAppointments(response.data);
+      } catch (error) {
+        console.error('Failed to fetch appointments:', error);
+      }
+    };
+    fetchAppointments();
+  }, []);
 
-  // Define columns for the table
   const columns = [
     {
       title: 'Doctor',
@@ -71,7 +76,7 @@ const Dashboard = () => {
               <List.Item>
                 <List.Item.Meta
                   avatar={<Avatar src="https://xsgames.co/randomusers/avatar.php?g=pixel" />}
-                  title={item.doctor}
+                  title={item.patient.name}
                   description={`Booking on ${item.date}`}
                 />
               </List.Item>

@@ -23,7 +23,7 @@ router.register(r'users', CustomUserViewSet)
 router.register(r'doctors', DoctorProfileViewSet)
 router.register(r'patients', PatientProfileViewSet)
 router.register(r'doctor-ratings', DoctorRatingView)
-router.register(r'appointments', AppointmentViewSet)
+router.register(r'appointments', AppointmentViewSet, basename='appointments')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
